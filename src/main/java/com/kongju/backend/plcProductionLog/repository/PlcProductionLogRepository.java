@@ -23,7 +23,7 @@ public interface PlcProductionLogRepository extends JpaRepository<PlcProductionL
     List<Object[]> findProductionChart(@Param("start") LocalDateTime start);
 
     @Query("""
-    select sum(p.cumulative)
+    select sum(p.count)
     from PlcProductionLogEntity p
     where function('date_format', p.timestamp, "%Y-%m-%d") = :today
     """)
