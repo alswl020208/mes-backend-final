@@ -7,6 +7,7 @@ import org.springframework.data.repository.query.Param;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 public interface PlcProductionLogRepository extends JpaRepository<PlcProductionLogEntity, Long> {
 
@@ -26,7 +27,7 @@ public interface PlcProductionLogRepository extends JpaRepository<PlcProductionL
     from PlcProductionLogEntity p
     where function('date_format', p.timestamp, "%Y-%m-%d") = :today
     """)
-    Long findTodayProduction(@Param("today") String today);
+    Optional<Long> findTodayProduction(@Param("today") String today);
 
 
 }

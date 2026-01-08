@@ -5,12 +5,14 @@ import com.kongju.backend.plcProductionLog.repository.PlcProductionLogRepository
 import com.kongju.backend.sensorLog.entiry.SensorLogEntity;
 import com.kongju.backend.sensorLog.repository.SensorLogRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class DashboardService {
@@ -19,8 +21,8 @@ public class DashboardService {
     private SensorLogRepository sensorLogRepository;
 
     public SensorLogEntity getLatestSensor(){
-        SensorLogEntity sensorLogEntity = sensorLogRepository.findTopByOrderByTimestampMsDesc();
-        return sensorLogEntity;
+        Optional<SensorLogEntity> sensorLogEntity = sensorLogRepository.findTopByOrderByTimestampMsDesc();
+        return sensorLogEntity.orElse(null);
     }
 
     @Autowired
@@ -43,9 +45,9 @@ public class DashboardService {
         long activeAlarmCount = 3;
         String today = LocalDate.now()
                 .format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
-        Long todayProduction = plcProductionLogRepository.findTodayProduction(today);
+        Optional<Long> todayProduction = plcProductionLogRepository.findTodayProduction(today);
         double defectRate = 13.7;
 
-        return new DashboardSummaryResponse(equipmentStatus, todayProduction, activeAlarmCount, defectRate);
+        return new DashboardSummaryResponse(equipmentStatus, todayProduction.orElse(0L), activeAlarmCount, defectRate);
     }
 }
