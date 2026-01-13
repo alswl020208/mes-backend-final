@@ -1,18 +1,18 @@
 package com.kongju.backend.dashboard.service;
 
-import com.kongju.backend.dashboard.controller.response.DashboardSummaryResponse;
-import com.kongju.backend.plcProductionLog.repository.PlcProductionLogRepository;
-import com.kongju.backend.sensorLog.entiry.SensorLogEntity;
-import com.kongju.backend.sensorLog.repository.SensorLogRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Service;
-
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.kongju.backend.dashboard.controller.response.DashboardSummaryResponse;
+import com.kongju.backend.plcProductionLog.repository.PlcProductionLogRepository;
+import com.kongju.backend.sensorLog.entiry.SensorLogEntity;
+import com.kongju.backend.sensorLog.repository.SensorLogRepository;
 
 @Service
 public class DashboardService {
@@ -29,7 +29,7 @@ public class DashboardService {
     private PlcProductionLogRepository plcProductionLogRepository ;
 
     public List<Object[]> getProductionChart(){
-        LocalDateTime nowMinus3Hours = LocalDateTime.now().minusHours(8);
+        LocalDateTime nowMinus3Hours = LocalDateTime.now().minusHours(3);
         List<Object[]> queryResult = plcProductionLogRepository.findProductionChart(nowMinus3Hours);
         return queryResult;
     }
@@ -50,4 +50,11 @@ public class DashboardService {
 
         return new DashboardSummaryResponse(equipmentStatus, todayProduction.orElse(0L), activeAlarmCount, defectRate);
     }
+
+    public List<Object[]> getDefectRate(String today){
+        List<Object[]> defectRate = plcProductionLogRepository.findTodayDefectRate(today);
+        return defectRate;
+    }
+    
+
 }

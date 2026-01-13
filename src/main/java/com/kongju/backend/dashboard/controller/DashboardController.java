@@ -1,14 +1,15 @@
 package com.kongju.backend.dashboard.controller;
 
-import com.kongju.backend.dashboard.controller.response.DashboardSummaryResponse;
-import com.kongju.backend.dashboard.service.DashboardService;
-import com.kongju.backend.plcProductionLog.repository.PlcProductionLogRepository;
-import com.kongju.backend.sensorLog.entiry.SensorLogEntity;
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
+import com.kongju.backend.dashboard.controller.response.DashboardSummaryResponse;
+import com.kongju.backend.dashboard.service.DashboardService;
+import com.kongju.backend.sensorLog.entiry.SensorLogEntity;
+
 
 @RestController
 public class DashboardController {
@@ -36,11 +37,12 @@ public class DashboardController {
         "vibration": 52,
         "speed": 32,
         "timestamp": "2026-01-08T17:24:30",
+        "humidity": 60,
         "timestampMs": 2026,
         "createdAt": "2026-01-08T17:24:30.737"
     }
      */
-    @RequestMapping("/api/dashboard/sensor-latest")
+    @RequestMapping("/api/dashboard/sensor")
     public SensorLogEntity getLatestSensor(){
         SensorLogEntity latestSensor = dashboardService.getLatestSensor();
         return latestSensor;
@@ -62,7 +64,7 @@ public class DashboardController {
         ["2026-01-08 17:26",50],
     ]
      */
-    @RequestMapping("/api/dashboard/production-chart")
+    @RequestMapping("/api/dashboard/chart")
     public List<Object[]> getProductionChart(){
         return dashboardService.getProductionChart();
     }
@@ -88,4 +90,42 @@ public class DashboardController {
     public DashboardSummaryResponse getSummary(){
         return dashboardService.getSummary();
     }
+
+    /*
+    제공한 쿼리를 이용해 해당 API를 추가해서 Dashboard에 표시하세요.(결함률은 소숫점 1자리까지 표시하세요.)    
+    GET /api/dashboard/defectRate API 추가
+    JPQL 사용해서 하기
+    */
+
+    @RequestMapping("/api/dashboard/defectRate")
+    public double getDefectRate(){
+        String today = java.time.LocalDate.now().format(java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+        /*
+        defectRate 의 값
+        [
+           [
+                29,
+                1
+            ]
+        ]
+        
+        결함률 = 결함수 / 전체수 * 100 로 만들어서 결함률 뿌리기
+        */ 
+        // Number defectRate_per = (Number)defectRate.get(0)[1] / (Number)defectRate.get(0)[0] * 100.0;
+        // return defectRate_per;
+
+        List<Object[]> defectRate = dashboardService.getDefectRate(today);
+
+        if (defectRate == null || defectRate.isEmpty()) {return 0.0;}
+
+        Object[] row = defectRate.get(0);
+
+        Number totalCount  = (Number) row[0]; // 전체 수
+        Number defectCount = (Number) row[1]; // 결함 수
+
+        if (totalCount.longValue() == 0) { return 0.0;}
+
+        return defectCount.doubleValue() / totalCount.doubleValue() * 100.0;
+    }
+    
 }
